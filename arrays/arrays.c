@@ -101,7 +101,6 @@ char *arr_read(Array *arr, int index)
  *****/
 void arr_insert(Array *arr, char *element, int index)
 {
-
   // Throw an error if the index is greater than the current count
   if (index > arr->count)
   {
@@ -110,20 +109,13 @@ void arr_insert(Array *arr, char *element, int index)
     return;
   }
   // Resize the array if the number of elements is over capacity
-  if (arr->count == arr->capacity)
-  {
-    printf("Array size and capacity are %d and %d, resp. Resizing array\n", arr->count, arr->capacity);
-    resize_array(arr);
-  }
+  if (arr->count == arr->capacity) resize_array(arr);
   // Move every element after the insert index to the right one position
   memmove(arr->elements + ((index + 1)), arr->elements + ( index), (arr->count - index) * sizeof(char *));
   // Copy the element (hint: use `strdup()`) and add it to the array
   *(arr->elements + (index)) = strdup(element);
   // Increment count by 1
   arr->count++;
-  // if (arr->count == 4){
-  //   printf("");
-  // }
 }
 
 /*****
@@ -162,6 +154,17 @@ void arr_remove(Array *arr, char *element)
   // Shift over every element after the removed element to the left one position
 
   // Decrement count by 1
+}
+
+void arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE-- YET. THIS IS CUSTOM FUNCTION OF MY OWN. 
+{
+
+  // Search for the occurence of the element and remove all such instances.
+  // Don't forget to free its memory!
+
+  // Shift over every element after the removed element to the left one position
+
+  // Decrement count by number of removed elements 
 }
 
 /*****
