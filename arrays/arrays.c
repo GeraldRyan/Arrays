@@ -85,8 +85,7 @@ char *arr_read(Array *arr, int index)
   // Throw an error if the index is greater or equal to than the current count
   if (index > arr->count)
   {
-    fprintf(stderr, "Index out of range");
-    printf("Index out of range in array_read\n");
+    fprintf(stderr, "Index out of range in array_read function");
     return NULL;
   }
 
@@ -109,9 +108,10 @@ void arr_insert(Array *arr, char *element, int index)
     return;
   }
   // Resize the array if the number of elements is over capacity
-  if (arr->count == arr->capacity) resize_array(arr);
+  if (arr->count == arr->capacity)
+    resize_array(arr);
   // Move every element after the insert index to the right one position
-  memmove(arr->elements + ((index + 1)), arr->elements + ( index), (arr->count - index) * sizeof(char *));
+  memmove(arr->elements + ((index + 1)), arr->elements + (index), (arr->count - index) * sizeof(char *));
   // Copy the element (hint: use `strdup()`) and add it to the array
   *(arr->elements + (index)) = strdup(element);
   // Increment count by 1
@@ -147,6 +147,19 @@ void arr_append(Array *arr, char *element)
  *****/
 void arr_remove(Array *arr, char *element)
 {
+  printf("Searching for element %s\n", element);
+  printf("Boolean condition %d\n", (element == *(arr->elements + 1)));
+  for (int i = 0; i < arr->count; i++)
+  {
+    printf("i is %d and element is %s. Arr->elements is %s \n", i, element, *(arr->elements + i));
+    if (strcmp(element, *(arr->elements + i)))
+    {
+      printf("Found the element %s!!\n", element);
+      memmove(*(arr->elements + i), arr->elements + i + 1, sizeof(char *) * (arr->count - (i + 1)));
+      return;
+    }
+  }
+  fprintf(stderr, "Fprintf stderr: Array element not found\n");
 
   // Search for the first occurence of the element and remove it.
   // Don't forget to free its memory!
@@ -156,7 +169,7 @@ void arr_remove(Array *arr, char *element)
   // Decrement count by 1
 }
 
-void arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE-- YET. THIS IS CUSTOM FUNCTION OF MY OWN. 
+void arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE-- YET. THIS IS CUSTOM FUNCTION OF MY OWN.
 {
 
   // Search for the occurence of the element and remove all such instances.
@@ -164,7 +177,7 @@ void arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FIL
 
   // Shift over every element after the removed element to the left one position
 
-  // Decrement count by number of removed elements 
+  // Decrement count by number of removed elements
 }
 
 /*****
