@@ -30,7 +30,7 @@ Array *create_array(int capacity)
   a->count = 0;
 
   // Allocate memory for elements
-  a->elements = malloc(sizeof(char*) * capacity);
+  a->elements = malloc(sizeof(char *) * capacity);
 
   return a;
 }
@@ -42,7 +42,8 @@ void destroy_array(Array *arr)
 {
 
   // Free all elements
-  if (arr->elements != NULL) free(arr->elements);
+  if (arr->elements != NULL)
+    free(arr->elements);
 
   // Free array
   free(arr);
@@ -63,10 +64,9 @@ void resize_array(Array *arr)
   // memcpy(new_array->elements, arr->elements, arr->count);
 
   // Free the old elements array (but NOT the strings they point to)
-      // WHY DO THIS WHEN I USED REALLOC?
+  // WHY DO THIS WHEN I USED REALLOC?
   // Update the elements and capacity to new values
-      // USING REALLOC
-
+  // USING REALLOC
 }
 
 /************************************
@@ -83,7 +83,8 @@ void resize_array(Array *arr)
 char *arr_read(Array *arr, int index)
 {
   // Throw an error if the index is greater or equal to than the current count
-  if (index > arr->count) {
+  if (index > arr->count)
+  {
     fprintf(stderr, "Index out of range");
     printf("Index out of range in array_read\n");
     return NULL;
@@ -91,7 +92,6 @@ char *arr_read(Array *arr, int index)
 
   // Otherwise, return the element at the given index
   return *(arr->elements + index);
-
 }
 
 /*****
@@ -103,23 +103,27 @@ void arr_insert(Array *arr, char *element, int index)
 {
 
   // Throw an error if the index is greater than the current count
-  if (index > arr->count) {
+  if (index > arr->count)
+  {
     fprintf(stderr, "Index out of range");
     printf("Index out of range in arr_insert\n");
-    return NULL;
+    return;
   }
   // Resize the array if the number of elements is over capacity
-  if (arr->count + 2 > arr->capacity){
+  if (arr->count == arr->capacity)
+  {
+    printf("Array size and capacity are %d and %d, resp. Resizing array\n", arr->count, arr->capacity);
     resize_array(arr);
   }
   // Move every element after the insert index to the right one position
-
-
+  memmove(arr->elements + ((index + 1)), arr->elements + ( index), (arr->count - index) * sizeof(char *));
   // Copy the element (hint: use `strdup()`) and add it to the array
-  strdup(*arr->elements,)
-
+  *(arr->elements + (index)) = strdup(element);
   // Increment count by 1
   arr->count++;
+  // if (arr->count == 4){
+  //   printf("");
+  // }
 }
 
 /*****
@@ -130,10 +134,17 @@ void arr_append(Array *arr, char *element)
 
   // Resize the array if the number of elements is over capacity
   // or throw an error if resize isn't implemented yet.
+  if (arr->count == arr->capacity)
+  {
+    printf("Array size and capacity are %d and %d, resp. Resizing array\n", arr->count, arr->capacity);
+    resize_array(arr);
+  }
 
   // Copy the element and add it to the end of the array
+  *(arr->elements + arr->count) = strdup(element);
 
   // Increment count by 1
+  arr->count++;
 }
 
 /*****
@@ -158,14 +169,20 @@ void arr_remove(Array *arr, char *element)
  *****/
 void arr_print(Array *arr)
 {
+  printf("Array count %d\n", arr->count);
   printf("[");
-  for (int i = 0; i < arr->count; i++)
+  for (int i = 0; i < arr->count; i++) // i gets too high, so count must get too high.
   {
+    // if (i == 3)
+    //   continue;
+
     printf("%s", arr->elements[i]);
+
     if (i != arr->count - 1)
     {
       printf(",");
     }
+    //  printf("array[%d]: %s  ", i, arr->elements[i]);
   }
   printf("]\n");
 }
@@ -173,15 +190,26 @@ void arr_print(Array *arr)
 #ifndef TESTING
 int main(void)
 {
-
   Array *arr = create_array(1);
+  arr_print(arr);
 
   arr_insert(arr, "STRING1", 0);
-  arr_append(arr, "STRING4");
-  arr_insert(arr, "STRING2", 0);
-  arr_insert(arr, "STRING3", 1);
   arr_print(arr);
+
+  arr_append(arr, "STRING4");
+  arr_print(arr);
+
+  arr_insert(arr, "STRING2", 0);
+  arr_print(arr);
+  arr_insert(arr, "STRING3", 1); // breaks when inserting into pos 1;
+  // printf("NOT BROKEN YET\n");
+  // printf("CURRENT ARRAY COUNT:%d\n", arr->count);
+  // printf("NOT BROKEN YET\n");
+
+  arr_print(arr);
+
   arr_remove(arr, "STRING3");
+
   arr_print(arr);
 
   destroy_array(arr);
