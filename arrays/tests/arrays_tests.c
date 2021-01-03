@@ -4,6 +4,9 @@
 char *day_1_array_tests()
 {
     Array *arr = create_array(3);
+    printf("Array Created of capacity: %d with a count of: %d\n", arr->capacity, arr->count);
+    resize_array(arr);
+    printf("Array Resized, new capacity: %d with count of: %d\n", arr->capacity, arr->count);
 
     mu_assert(arr->count == 0, "Create failed");
     mu_assert(arr->capacity == 3, "Create failed");

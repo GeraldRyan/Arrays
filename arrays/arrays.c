@@ -56,12 +56,17 @@ void resize_array(Array *arr)
 {
 
   // Create a new element storage with double capacity
+  arr->capacity *= 2;
+  arr->elements = realloc(arr->elements, arr->capacity);
 
   // Copy elements into the new storage
+  // memcpy(new_array->elements, arr->elements, arr->count);
 
   // Free the old elements array (but NOT the strings they point to)
-
+      // WHY DO THIS WHEN I USED REALLOC?
   // Update the elements and capacity to new values
+      // USING REALLOC
+
 }
 
 /************************************
@@ -77,10 +82,16 @@ void resize_array(Array *arr)
  *****/
 char *arr_read(Array *arr, int index)
 {
-
   // Throw an error if the index is greater or equal to than the current count
+  if (index > arr->count) {
+    fprintf(stderr, "Index out of range");
+    printf("Index out of range in array_read\n");
+    return NULL;
+  }
 
   // Otherwise, return the element at the given index
+  return *(arr->elements + index);
+
 }
 
 /*****
@@ -92,14 +103,23 @@ void arr_insert(Array *arr, char *element, int index)
 {
 
   // Throw an error if the index is greater than the current count
-
+  if (index > arr->count) {
+    fprintf(stderr, "Index out of range");
+    printf("Index out of range in arr_insert\n");
+    return NULL;
+  }
   // Resize the array if the number of elements is over capacity
-
+  if (arr->count + 2 > arr->capacity){
+    resize_array(arr);
+  }
   // Move every element after the insert index to the right one position
 
+
   // Copy the element (hint: use `strdup()`) and add it to the array
+  strdup(*arr->elements,)
 
   // Increment count by 1
+  arr->count++;
 }
 
 /*****
