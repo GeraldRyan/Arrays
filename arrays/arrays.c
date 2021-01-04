@@ -424,8 +424,8 @@ int arr_sort(Array *arr, int (*op)())
 void swap(char **a, char **b)
 {
   // GETTING THESE EXACT POINTER COMBINATIONS IS CRITICAL FOR SUCCESS AND NOT CRASHING FOR THAT MATTER
-  char* tmp = *a;
-  *a = *b;   // now both equal value of b
+  char *tmp = *a;
+  *a = *b;  // now both equal value of b
   *b = tmp; // now they're swapped
 }
 
@@ -441,6 +441,31 @@ int arr_reverse(Array *arr)
     end--;
   }
   return 1;
+}
+
+int arr_extend(Array *arr1, Array *arr2)
+{
+  arr1->elements = realloc(arr1->elements, (arr1->count + arr2->count + 5) * sizeof(char *));
+  memcpy(arr1->elements + (arr1->count), arr2->elements, (arr2->count) * sizeof(char *));
+  arr1->capacity += (arr2->count + 5);
+  arr1->count += arr2->count;
+  // don't free anything. Keep the original.
+
+  return 1;
+}
+
+Array* arr_copy(Array *dst, Array *src)
+{
+
+  dst->count = src->count;
+  dst->capacity = src->capacity;
+  dst->original_capacity = src->original_capacity;
+  dst->elements = realloc(dst->elements, dst->capacity * sizeof(char *));
+  printf("Resized dst successfully. Capacity:%d count:%d\n", dst->capacity, dst->count);
+  memcpy(dst->elements, src->elements, src->count * sizeof(char*));
+  printf("PRINTING DESTINATION IN FUNCTION SCOPE\n");
+  arr_print(dst);
+  return dst; 
 }
 
 void init_dummy_array(Array *arr)
@@ -485,17 +510,17 @@ int main(void)
   arr_print(arr);
 
   arr_remove_all(arr, "STRING3");
-  arr_insert(arr, "STRING4", 1);
-  arr_insert(arr, "STRING4", 1);
-  arr_insert(arr, "STRING5", 2);
-  arr_insert(arr, "STRING4", 1);
-  arr_insert(arr, "STRING4", 1);
-  arr_append(arr, "STRING8");
+  arr_insert(arr, "Ssdf", 1);
+  arr_insert(arr, "BDSDF", 1);
+  arr_insert(arr, "DDD", 2);
+  arr_insert(arr, "garlic", 1);
+  arr_insert(arr, "onions", 1);
+  arr_append(arr, "liverwurst");
   arr_print(arr);
   char *poppa = arr_pop(arr, poppa);
   printf("This is the value of the popped string: %s\n", poppa);
   arr_print(arr);
-  char *popbyindex = arr_pop_by_index(arr, popbyindex, arr_index(arr, "STRING5"));
+  char *popbyindex = arr_pop_by_index(arr, popbyindex, arr_index(arr, "DDD"));
   printf("This is the value of the popped by index string: %s\n", popbyindex);
   arr_print(arr);
   arr_clear(arr);
@@ -519,8 +544,35 @@ int main(void)
   printf("\nTEST ARRAY REVERSE\n");
   init_dummy_array(arr);
   arr_print(arr);
-  arr_reverse(arr);
+  arr_reverse(arr); // went bad
   arr_print(arr);
+  printf("\nTEST ARRAY EXTEND\n");
+  arr_clear(arr);
+  init_dummy_array(arr);
+  arr_print(arr);
+  Array *arr2 = create_array(5);
+  arr_append(arr2, "Jesus");
+  arr_append(arr2, "SX");
+  arr_append(arr2, "GXX");
+  arr_insert(arr2, "Andy", 2);
+  arr_insert(arr2, "Carlos", 1);
+  arr_insert(arr2, "Quigon", 1);
+  arr_print(arr2);
+  printf("EXTENDING\n");
+  arr_extend(arr, arr2);
+  printf("CHECKING extended array\n");
+  arr_print(arr);
+
+  printf("\nTESTING ARRAY COPY\n");
+  Array* arr_cpy = create_array(1);
+  printf("Printing array to copy\n");
+  arr_print(arr);
+  printf("Printing blank array\n");
+  arr_print(arr_cpy);
+  arr_cpy = arr_copy(arr_cpy, arr);
+  printf("Printing finished copy. Did it work?\n");
+  arr_print(arr_cpy);
+
 
   // TURN ON TO SEE VARIABLE ARGUMENT TESTING
   // my_va_test(arr, 7, 1, 2, 4, 5);
