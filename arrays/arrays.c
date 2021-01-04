@@ -147,15 +147,14 @@ void arr_append(Array *arr, char *element)
  *****/
 void arr_remove(Array *arr, char *element)
 {
-  printf("Searching for element %s\n", element);
-  printf("Boolean condition %d\n", (element == *(arr->elements + 1)));
+  printf("Boolean condition %d\n", (*element == **(arr->elements + 1)));
   for (int i = 0; i < arr->count; i++)
   {
-    printf("i is %d and element is %s. Arr->elements is %s \n", i, element, *(arr->elements + i));
-    if (strcmp(element, *(arr->elements + i)))
+    if (strcmp(element, *(arr->elements + i)) == 0)
     {
       printf("Found the element %s!!\n", element);
-      memmove(*(arr->elements + i), arr->elements + i + 1, sizeof(char *) * (arr->count - (i + 1)));
+      memmove((arr->elements + i), arr->elements + i + 1, sizeof(char *) * (arr->count - (i + 1)));
+      arr->count--;
       return;
     }
   }
@@ -223,7 +222,7 @@ int main(void)
   // printf("NOT BROKEN YET\n");
 
   arr_print(arr);
-
+  printf("Removing STRING3 from it's position\n");
   arr_remove(arr, "STRING3");
 
   arr_print(arr);
