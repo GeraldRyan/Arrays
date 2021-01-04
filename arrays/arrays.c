@@ -64,7 +64,7 @@ int shrink_array(Array *arr)
   {
     printf("Array count is zero, being restored to it's original capacity of %d\n", arr->capacity);
     arr->capacity = arr->original_capacity;
-    arr->elements = realloc(arr->elements, arr->capacity * sizeof(char*));
+    arr->elements = realloc(arr->elements, arr->capacity * sizeof(char *));
     return 1;
   }
   else if (arr->count < (arr->capacity / 4))
@@ -405,20 +405,55 @@ int arr_sort_A_2_Z(const void *stringA, const void *stringB)
   const char **intA = (const char **)stringA;
   const char **intB = (const char **)stringB;
 
-  return strcmp(*intA,*intB);
+  return strcmp(*intA, *intB);
 }
 
 int arr_sort_Z_2_A(const void *stringA, const void *stringB)
 {
   const char **intA = (const char **)stringA;
   const char **intB = (const char **)stringB;
-  return strcmp(*intB,*intA);
+  return strcmp(*intB, *intA);
 }
 
-int arr_sort(Array *arr, int(*op)())
+int arr_sort(Array *arr, int (*op)())
 {
-  qsort(arr->elements, arr->count, sizeof(char*), op);
+  qsort(arr->elements, arr->count, sizeof(char *), op);
   return 1;
+}
+
+void swap(char **a, char **b)
+{
+  // GETTING THESE EXACT POINTER COMBINATIONS IS CRITICAL FOR SUCCESS AND NOT CRASHING FOR THAT MATTER
+  char* tmp = *a;
+  *a = *b;   // now both equal value of b
+  *b = tmp; // now they're swapped
+}
+
+int arr_reverse(Array *arr)
+{
+  int start = 0;
+  int end = arr->count - 1;
+
+  while (start < end)
+  {
+    swap(arr->elements[start], arr->elements[end]);
+    start++;
+    end--;
+  }
+  return 1;
+}
+
+void init_dummy_array(Array *arr)
+{
+  arr_append(arr, "D");
+  arr_append(arr, "C");
+  arr_append(arr, "G");
+  arr_append(arr, "A");
+  arr_append(arr, "Babba");
+  arr_append(arr, "Bubba");
+  arr_append(arr, "Fudge");
+  arr_append(arr, "Zed");
+  arr_append(arr, "T");
 }
 
 #ifndef TESTING
@@ -469,15 +504,7 @@ int main(void)
   // arr_insert(arr, "STRING3", 1);
 
   printf("\nCHECK SORTING:\n");
-  arr_append(arr, "D");
-  arr_append(arr, "C");
-  arr_append(arr, "G");
-  arr_append(arr, "A");
-  arr_append(arr, "Babba");
-  arr_append(arr, "Bubba");
-  arr_append(arr, "Fudge");
-  arr_append(arr, "Zed");
-  arr_append(arr, "T");
+  init_dummy_array(arr);
   printf("UNSORTED ARRAY\n");
   arr_print(arr);
   printf(". Sorting alphabetically A to Z\n");
@@ -487,11 +514,15 @@ int main(void)
   printf("Now sorting Z-A, reverse alphabetically\n");
   arr_sort(arr, arr_sort_Z_2_A);
   arr_print(arr);
+  arr_clear(arr);
 
+  printf("\nTEST ARRAY REVERSE\n");
+  init_dummy_array(arr);
+  arr_print(arr);
+  arr_reverse(arr);
+  arr_print(arr);
 
-
-
-// TURN ON TO SEE VARIABLE ARGUMENT TESTING
+  // TURN ON TO SEE VARIABLE ARGUMENT TESTING
   // my_va_test(arr, 7, 1, 2, 4, 5);
   // my_va_test(arr);
 

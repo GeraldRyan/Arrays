@@ -21,8 +21,8 @@ char* arr_pop(Array *arr); // FINISHED BUT WANT TO MAKE THIS VARIADIC WITH INDEX
 int arr_pop_no_rtn(Array *arr); // FINISHED BUT WANT TO MAKE THIS VARIADIC WITH INDEX FEATURE 
 int arr_copy(Array *dst, Array* srt);
 int arr_index(Array *arr, char *element); //
-int arr_reverse(Array *arr); // SHOULDN'T BE TOO HARD, BUT HOW TO DO IT OPTIMALLY? SEARCH LEET FOR THIS VERY ONE AND CLONE
-int arr_sort(Array *arr);  // SHOULD TRY TO USE A FUNCTION POINTER WITH THE CHOICE OF EITHER-OR SORTING PREFERENCE
+int arr_reverse(Array *arr); // TODO
+int arr_sort(Array *arr);  // 
 int arr_pop_by_index(Array *arr, int index); //
 
 
