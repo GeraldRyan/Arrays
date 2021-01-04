@@ -16,14 +16,14 @@ void arr_insert(Array *arr, char *element, int index);
 void arr_remove(Array *arr, char *element);
 
 // STRETCH GOALS
-int arr_clear(Array *arr);
-char* arr_pop(Array *arr);
-int arr_pop_no_rtn(Array *arr);
+int arr_clear(Array *arr); //
+char* arr_pop(Array *arr); //
+int arr_pop_no_rtn(Array *arr); //
 int arr_copy(Array *dst, Array* srt);
-int arr_index(Array *arr);
+int arr_index(Array *arr, char *element);
 int arr_reverse(Array *arr);
 int arr_sort(Array *arr);
-int arr_pop_by_index(Array *arr, int index);
+int arr_pop_by_index(Array *arr, int index); //
 
 
 

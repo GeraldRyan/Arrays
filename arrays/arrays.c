@@ -324,6 +324,25 @@ char *arr_pop_by_index(Array *arr, char *return_val_ptr, int index)
   }
 }
 
+int arr_index(Array *arr, char *element)
+{ // gets the index matching
+  int index = -1;
+  if (arr->count > 0)
+  {
+    for (int i = 0; i < arr->count; i++)
+    {
+      if (strcmp(arr->elements[i], element) == 0)
+      {
+        return i;
+      }
+    }
+  }
+  else
+  {
+    return index;
+  }
+}
+
 #ifndef TESTING
 int main(void)
 {
@@ -355,7 +374,7 @@ int main(void)
   arr_remove_all(arr, "STRING3");
   arr_insert(arr, "STRING4", 1);
   arr_insert(arr, "STRING4", 1);
-  arr_insert(arr, "STRING4", 1);
+  arr_insert(arr, "STRING5", 2);
   arr_insert(arr, "STRING4", 1);
   arr_insert(arr, "STRING4", 1);
   arr_append(arr, "STRING8");
@@ -363,7 +382,7 @@ int main(void)
   char *poppa = arr_pop(arr, poppa);
   printf("This is the value of the popped string: %s\n", poppa);
   arr_print(arr);
-  char * popbyindex = arr_pop_by_index(arr, popbyindex, 6);
+  char *popbyindex = arr_pop_by_index(arr, popbyindex, arr_index(arr, "STRING5"));
   printf("This is the value of the popped by index string: %s\n", popbyindex);
   arr_print(arr);
   arr_clear(arr);
