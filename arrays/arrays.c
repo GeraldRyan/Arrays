@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdarg.h> // for variadic functions
 
 typedef struct Array
 {
   // can we add a dimensionality field?? GR
-  int capacity;    // How many elements can this array hold?
-  int count;       // How many states does the array currently hold?
-  char **elements; // The string elements contained in the array
+  int capacity;          // How many elements can this array hold?
+  int original_capacity; // How many elements can this array hold?
+  int count;             // How many states does the array currently hold?
+  char **elements;       // The string elements contained in the array
 } Array;
 
 /************************************
@@ -27,6 +29,7 @@ Array *create_array(int capacity)
 
   // Set initial values for capacity and count
   a->capacity = capacity;
+  a->original_capacity = capacity;
   a->count = 0;
 
   // Allocate memory for elements
@@ -53,6 +56,30 @@ void destroy_array(Array *arr)
  * Create a new elements array with double capacity and copy elements
  * from old to new
  *****/
+
+int shrink_array(Array *arr)
+{
+  if (arr->count == 0)
+  {
+    printf("Array count is zero, being restored to it's original capacity of %d\n", arr->capacity);
+    arr->capacity = arr->original_capacity;
+    arr->elements = realloc(arr->elements, arr->capacity);
+    return 1;
+  }
+  else if (arr->count < (arr->capacity / 4))
+  {
+    printf("Array being shrunk count:%d capacity:%d (less than 1/4 full, being shrunk by half)\n", arr->count, arr->capacity);
+    arr->capacity = arr->count * 2;
+    arr->elements = realloc(arr->elements, arr->capacity * sizeof(char *));
+    printf("New count:%d and new capacity:%d\n", arr->count, arr->capacity * sizeof(char *));
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 void resize_array(Array *arr)
 {
   char **tmp;
@@ -177,20 +204,17 @@ int arr_remove(Array *arr, char *element)
     if (strcmp(element, *(arr->elements + i)) == 0)
     {
       memmove((arr->elements + i), arr->elements + i + 1, sizeof(char *) * (arr->count - (i + 1)));
-      arr->elements[arr->count-1] = NULL;
+      arr->elements[arr->count - 1] = NULL;
       arr->count--;
+      shrink_array(arr);
       return 1; // removed something
     }
   }
   // fprintf(stderr, "Fprintf stderr: Array element not found\n");
   return 0; // Nothing removed
-
   // Search for the first occurence of the element and remove it.
   // Don't forget to free its memory!
-
   // Shift over every element after the removed element to the left one position
-
-  // Decrement count by 1
 }
 
 int arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE BEING TESTED. THIS IS CUSTOM FUNCTION OF MY OWN.
@@ -198,10 +222,10 @@ int arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE
   int i = 0;
   while (arr_remove(arr, element))
   {
-    printf("element %s removed\n", element);
     i++;
   };
-  printf("%d elements removed\n", i);
+  printf("element \"%s\" removed %d times\n", element, i);
+  shrink_array(arr);
   return i;
 }
 
@@ -228,10 +252,82 @@ void arr_print(Array *arr)
   printf("]\n");
 }
 
+/// STRETCH GOALS ///////
+/// STRETCH GOALS ///////
+/// STRETCH GOALS ///////
+/// STRETCH GOALS ///////
+/// STRETCH GOALS ///////
+
+int arr_clear(Array *arr)
+{
+  if (arr->count == 0)
+    return 0;
+  while (arr->count > 0)
+  {
+    arr->elements[arr->count - 1] = NULL;
+    arr->count--;
+  }
+  shrink_array(arr);
+  return 1;
+}
+
+int arr_pop_no_rtn(Array *arr)
+{
+  if (arr->count > 0)
+  {
+    arr->elements[arr->count - 1] = NULL;
+    arr->count--;
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+char *arr_pop(Array *arr, char *return_val_ptr) // TODO MAKE THIS A VARIADIC FUNCTION TO POP A GIVEN INDEX
+{
+  if (arr->count > 0)
+  {
+    int last_index = arr->count - 1;
+    int last_element_length = strlen(arr->elements[last_index]);
+    char *return_val_ptr = malloc(last_element_length); // DON'T WANT. Then you have to free it from the heap.
+    strcpy(return_val_ptr, arr->elements[last_index]);
+    arr->elements[last_index] = NULL;
+    arr->count--;
+    shrink_array(arr);
+    return return_val_ptr;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+char *arr_pop_by_index(Array *arr, char *return_val_ptr, int index)
+{
+  if (arr->count > 0)
+  {
+    int element_length = strlen(arr->elements[index]);
+    char *return_val_ptr = malloc(element_length); // DON'T WANT. Then you have to free it from the heap.
+    strcpy(return_val_ptr, arr->elements[index]);
+    // arr->elements[index] = NULL;
+    memmove((arr->elements + index), arr->elements + index + 1, sizeof(char *) * (arr->count - (index + 1)));
+    arr->elements[arr->count - 1] = NULL;
+    arr->count--;
+    shrink_array(arr);
+    return return_val_ptr;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 #ifndef TESTING
 int main(void)
 {
-  Array *arr = create_array(1);
+  Array *arr = create_array(7);
   arr_print(arr);
 
   arr_insert(arr, "STRING1", 0);
@@ -257,7 +353,20 @@ int main(void)
   arr_print(arr);
 
   arr_remove_all(arr, "STRING3");
-
+  arr_insert(arr, "STRING4", 1);
+  arr_insert(arr, "STRING4", 1);
+  arr_insert(arr, "STRING4", 1);
+  arr_insert(arr, "STRING4", 1);
+  arr_insert(arr, "STRING4", 1);
+  arr_append(arr, "STRING8");
+  arr_print(arr);
+  char *poppa = arr_pop(arr, poppa);
+  printf("This is the value of the popped string: %s\n", poppa);
+  arr_print(arr);
+  char * popbyindex = arr_pop_by_index(arr, popbyindex, 6);
+  printf("This is the value of the popped by index string: %s\n", popbyindex);
+  arr_print(arr);
+  arr_clear(arr);
   // arr_insert(arr, "STRING3", 1);
 
   arr_print(arr);

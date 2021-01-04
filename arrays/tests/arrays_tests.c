@@ -73,6 +73,54 @@ char *day_2_array_tests()
     return NULL;
 }
 
+char *day_3_array_tests(){
+
+    Array *arr = create_array(1);
+    
+    arr_insert(arr, "VALUE-1", 0);
+    arr_print(arr);
+
+    mu_assert(strcmp(arr_read(arr, 0), "VALUE-1") == 0, "Insert value failed");
+
+    arr_insert(arr, "VALUE-2", 0);
+
+    mu_assert(arr->capacity == 2, "Resize array on insert failed");
+    mu_assert(arr->count == 2, "Resize array on insert failed");
+
+    mu_assert(strcmp(arr_read(arr, 0), "VALUE-2") == 0, "Insert value failed");
+    mu_assert(strcmp(arr_read(arr, 1), "VALUE-1") == 0, "Insert value failed");
+
+    arr_insert(arr, "VALUE-3", 1);
+
+    mu_assert(arr->capacity == 4, "Resize array on insert failed");
+    mu_assert(arr->count == 3, "Resize array on insert failed");
+
+    mu_assert(strcmp(arr_read(arr, 0), "VALUE-2") == 0, "Insert value failed");
+    mu_assert(strcmp(arr_read(arr, 1), "VALUE-3") == 0, "Insert value failed");
+    mu_assert(strcmp(arr_read(arr, 2), "VALUE-1") == 0, "Insert value failed");
+
+    arr_remove(arr, "VALUE-3");
+
+    mu_assert(arr->count == 2, "Remove count failed");
+
+    mu_assert(strcmp(arr_read(arr, 0), "VALUE-2") == 0, "Remove value failed");
+    mu_assert(strcmp(arr_read(arr, 1), "VALUE-1") == 0, "Remove value failed");
+    printf("Array at 2 %s\n", arr->elements[2]);
+    mu_assert(arr_read(arr, 2) == NULL, "Remove value failed");  
+    arr_insert(arr, "VALUE-2", 0);
+    arr_insert(arr, "VALUE-2", 0);
+    arr_insert(arr, "VALUE-2", 0);
+    arr_insert(arr, "VALUE-2", 0);
+    arr_insert(arr, "VALUE-2", 0);
+    arr_print(arr);
+    mu_assert(arr_remove_all(arr, "VALUE-2") == 6, "Remove ALL failed");
+    arr_print(arr);
+
+    destroy_array(arr);
+
+
+    return NULL;
+}
 
 /* NOTE: you will need to add your 
     function declarations in arrays.h and 
@@ -84,15 +132,15 @@ char *stretch_array_tests()
     Array *arr = create_array(10);
 
     /* CLEAR */
-    // arr_append(arr, "VALUE-1");
-    // arr_append(arr, "VALUE-2");
-    // mu_assert(arr->count == 2, "Count should be updated after append.");
+    arr_append(arr, "VALUE-1");
+    arr_append(arr, "VALUE-2");
+    mu_assert(arr->count == 2, "Count should be updated after append.");
 
-    // arr_clear(arr);
-    // mu_assert(arr->count == 0, "Array should be empty after clear.");
+    arr_clear(arr);
+    mu_assert(arr->count == 0, "Array should be empty after clear.");
 
-    // arr_append(arr, "VALUE-3");
-    // mu_assert(strcmp(arr_read(arr, 0), "VALUE-3") == 0, "Append after clear failed.");
+    arr_append(arr, "VALUE-3");
+    mu_assert(strcmp(arr_read(arr, 0), "VALUE-3") == 0, "Append after clear failed.");
 
     /* COPY */
     // Array *cpy_arr = arr_copy(arr);
@@ -156,7 +204,7 @@ char *all_tests()
 
     mu_run_test(day_1_array_tests);
     mu_run_test(day_2_array_tests);
-    mu_run_test(day_3_array_tests); // added myself to test array remove all function
+    mu_run_test(day_3_array_tests); // added myself to test array remove all function (and learn about this program)
     mu_run_test(stretch_array_tests);
 
     return NULL;
