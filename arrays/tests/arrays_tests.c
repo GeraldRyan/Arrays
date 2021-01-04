@@ -5,8 +5,6 @@ char *day_1_array_tests()
 {
     Array *arr = create_array(3);
     printf("Array Created of capacity: %d with a count of: %d\n", arr->capacity, arr->count);
-    resize_array(arr);
-    printf("Array Resized, new capacity: %d with count of: %d\n", arr->capacity, arr->count);
 
     mu_assert(arr->count == 0, "Create failed");
     mu_assert(arr->capacity == 3, "Create failed");
@@ -36,10 +34,12 @@ char *day_2_array_tests()
     Array *arr = create_array(1);
 
     arr_insert(arr, "VALUE-1", 0);
+    arr_print(arr);
 
     mu_assert(strcmp(arr_read(arr, 0), "VALUE-1") == 0, "Insert value failed");
 
     arr_insert(arr, "VALUE-2", 0);
+    arr_print(arr);
 
     mu_assert(arr->capacity == 2, "Resize array on insert failed");
     mu_assert(arr->count == 2, "Resize array on insert failed");
@@ -48,6 +48,7 @@ char *day_2_array_tests()
     mu_assert(strcmp(arr_read(arr, 1), "VALUE-1") == 0, "Insert value failed");
 
     arr_insert(arr, "VALUE-3", 1);
+    arr_print(arr);
 
     mu_assert(arr->capacity == 4, "Resize array on insert failed");
     mu_assert(arr->count == 3, "Resize array on insert failed");
@@ -57,12 +58,15 @@ char *day_2_array_tests()
     mu_assert(strcmp(arr_read(arr, 2), "VALUE-1") == 0, "Insert value failed");
 
     arr_remove(arr, "VALUE-3");
+    arr_print(arr);
 
     mu_assert(arr->count == 2, "Remove count failed");
 
     mu_assert(strcmp(arr_read(arr, 0), "VALUE-2") == 0, "Remove value failed");
     mu_assert(strcmp(arr_read(arr, 1), "VALUE-1") == 0, "Remove value failed");
-    mu_assert(arr_read(arr, 2) == NULL, "Remove value failed");
+    arr_print(arr);
+    printf("Array at 2 %s\n", arr->elements[2]);
+    mu_assert(arr_read(arr, 2) == NULL, "Remove value failed");  
 
     destroy_array(arr);
 
@@ -152,6 +156,7 @@ char *all_tests()
 
     mu_run_test(day_1_array_tests);
     mu_run_test(day_2_array_tests);
+    mu_run_test(day_3_array_tests); // added myself to test array remove all function
     mu_run_test(stretch_array_tests);
 
     return NULL;

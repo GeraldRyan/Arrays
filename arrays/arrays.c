@@ -30,7 +30,7 @@ Array *create_array(int capacity)
   a->count = 0;
 
   // Allocate memory for elements
-  a->elements = malloc(sizeof(char *) * capacity);
+  a->elements = malloc(sizeof(char **) * capacity);
 
   return a;
 }
@@ -55,10 +55,19 @@ void destroy_array(Array *arr)
  *****/
 void resize_array(Array *arr)
 {
-
+  char **tmp;
   // Create a new element storage with double capacity
   arr->capacity *= 2;
-  arr->elements = realloc(arr->elements, arr->capacity);
+  printf("Reallocing with new capacity %d\n", arr->capacity);
+  tmp = realloc(arr->elements, arr->capacity * sizeof(char *));
+  if (tmp == NULL)
+  {
+    printf("Realloc failed\n");
+  }
+  else
+  {
+    arr->elements = tmp;
+  }
 
   // Copy elements into the new storage
   // memcpy(new_array->elements, arr->elements, arr->count);
@@ -128,7 +137,6 @@ void arr_append(Array *arr, char *element)
   // or throw an error if resize isn't implemented yet.
   if (arr->count == arr->capacity)
   {
-    printf("Array size and capacity are %d and %d, resp. Resizing array\n", arr->count, arr->capacity);
     resize_array(arr);
   }
 
@@ -139,26 +147,43 @@ void arr_append(Array *arr, char *element)
   arr->count++;
 }
 
+int mystrcmp(char *s1, char *s2)
+{
+  int len1 = strlen(s1);
+  int len2 = strlen(s2);
+  if (len1 != len2)
+    return 1;
+  for (int i = 0; i < len2; i++)
+  {
+    if (*(s1 + i) != *(s2 + i))
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 /*****
  * Remove the first occurence of the given element from the array,
  * then shift every element after that occurence to the left one slot.
  *
  * Throw an error if the value is not found.
  *****/
-void arr_remove(Array *arr, char *element)
+int arr_remove(Array *arr, char *element)
 {
-  printf("Boolean condition %d\n", (*element == **(arr->elements + 1)));
   for (int i = 0; i < arr->count; i++)
   {
+    // if (mystrcmp(element, *(arr->elements + i)) == 0) // Built my own strcmp function, it works, but let's use the built-in.
     if (strcmp(element, *(arr->elements + i)) == 0)
     {
-      printf("Found the element %s!!\n", element);
       memmove((arr->elements + i), arr->elements + i + 1, sizeof(char *) * (arr->count - (i + 1)));
+      arr->elements[arr->count-1] = NULL;
       arr->count--;
-      return;
+      return 1; // removed something
     }
   }
-  fprintf(stderr, "Fprintf stderr: Array element not found\n");
+  // fprintf(stderr, "Fprintf stderr: Array element not found\n");
+  return 0; // Nothing removed
 
   // Search for the first occurence of the element and remove it.
   // Don't forget to free its memory!
@@ -168,15 +193,16 @@ void arr_remove(Array *arr, char *element)
   // Decrement count by 1
 }
 
-void arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE-- YET. THIS IS CUSTOM FUNCTION OF MY OWN.
+int arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FILE BEING TESTED. THIS IS CUSTOM FUNCTION OF MY OWN.
 {
-
-  // Search for the occurence of the element and remove all such instances.
-  // Don't forget to free its memory!
-
-  // Shift over every element after the removed element to the left one position
-
-  // Decrement count by number of removed elements
+  int i = 0;
+  while (arr_remove(arr, element))
+  {
+    printf("element %s removed\n", element);
+    i++;
+  };
+  printf("%d elements removed\n", i);
+  return i;
 }
 
 /*****
@@ -184,7 +210,7 @@ void arr_remove_all(Array *arr, char *element) // NB THIS IS NOT IN THE TEST FIL
  *****/
 void arr_print(Array *arr)
 {
-  printf("Array count %d\n", arr->count);
+  printf("Array count %d and capacity %d\n", arr->count, arr->capacity);
   printf("[");
   for (int i = 0; i < arr->count; i++) // i gets too high, so count must get too high.
   {
@@ -216,14 +242,23 @@ int main(void)
 
   arr_insert(arr, "STRING2", 0);
   arr_print(arr);
-  arr_insert(arr, "STRING3", 1); // breaks when inserting into pos 1;
-  // printf("NOT BROKEN YET\n");
-  // printf("CURRENT ARRAY COUNT:%d\n", arr->count);
-  // printf("NOT BROKEN YET\n");
+  arr_insert(arr, "STRING3", 1);
+  arr_print(arr);
+  arr_remove(arr, "STRING3");
 
   arr_print(arr);
-  printf("Removing STRING3 from it's position\n");
-  arr_remove(arr, "STRING3");
+  arr_insert(arr, "STRING3", 1);
+  arr_print(arr);
+  arr_insert(arr, "STRING3", 1);
+  arr_insert(arr, "STRING3", 1);
+  arr_insert(arr, "STRING3", 1);
+  arr_insert(arr, "STRING3", 1);
+  arr_insert(arr, "STRING3", 1);
+  arr_print(arr);
+
+  arr_remove_all(arr, "STRING3");
+
+  // arr_insert(arr, "STRING3", 1);
 
   arr_print(arr);
 
