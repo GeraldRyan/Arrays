@@ -3,6 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h> // for variadic functions
+#include "var_arg_util.h"
 
 typedef struct Array
 {
@@ -63,7 +64,7 @@ int shrink_array(Array *arr)
   {
     printf("Array count is zero, being restored to it's original capacity of %d\n", arr->capacity);
     arr->capacity = arr->original_capacity;
-    arr->elements = realloc(arr->elements, arr->capacity);
+    arr->elements = realloc(arr->elements, arr->capacity * sizeof(char*));
     return 1;
   }
   else if (arr->count < (arr->capacity / 4))
@@ -324,6 +325,33 @@ char *arr_pop_by_index(Array *arr, char *return_val_ptr, int index)
   }
 }
 
+// char *base_arr_pop_can_index(int count, Array *arr, char *return_val_ptr, ...)
+// {
+//   printf("Count is:%d \n", count);
+//   if (count == 3)
+//   {
+//     return arr_pop(arr, return_val_ptr);
+//   }
+
+//   if (count > 3)
+//   {
+//     int index;
+//     printf("He wants to index!\n");
+//     va_list va;
+//     va_start(return_val_ptr, va);
+//     va_arg(va, int);
+//     index = va;
+
+//     printf("VA Count %d", count);
+//     printf("He wants to index at %d!\n", index);
+//     va_end(va);
+//   }
+//   else
+//   {
+//     printf("Count is: %d. He maybe doesn't want to index\n");
+//   }
+// }
+
 int arr_index(Array *arr, char *element)
 { // gets the index matching
   int index = -1;
@@ -341,6 +369,56 @@ int arr_index(Array *arr, char *element)
   {
     return index;
   }
+}
+
+int get_va_cnt(int count, ...)
+{
+  va_list va;
+  va_start(va, count);
+  for (int i = 0; i < count; i++)
+  {
+    int n = va_arg(va, int);
+    printf("VarArg %d = %d\n", i, n);
+  }
+}
+
+void va_test(int count, Array *arr, ...)
+{
+  va_list va;
+  // int va_count = PP_NARG()
+  va_start(va, arr); // seg faults
+  printf("VarArg i:arg");
+  for (int i = 0; i < count; i++)
+  {
+    if (i == 1)
+      continue;
+    int n = va_arg(va, int);
+    printf(" {%d:%d} ", i, n);
+  }
+  printf("\n");
+  // int index = va_arg(va, int);
+}
+
+int arr_sort_A_2_Z(const void *stringA, const void *stringB)
+{
+
+  const char **intA = (const char **)stringA;
+  const char **intB = (const char **)stringB;
+
+  return strcmp(*intA,*intB);
+}
+
+int arr_sort_Z_2_A(const void *stringA, const void *stringB)
+{
+  const char **intA = (const char **)stringA;
+  const char **intB = (const char **)stringB;
+  return strcmp(*intB,*intA);
+}
+
+int arr_sort(Array *arr, int(*op)())
+{
+  qsort(arr->elements, arr->count, sizeof(char*), op);
+  return 1;
 }
 
 #ifndef TESTING
@@ -386,10 +464,46 @@ int main(void)
   printf("This is the value of the popped by index string: %s\n", popbyindex);
   arr_print(arr);
   arr_clear(arr);
+  arr_print(arr);
+  printf("Array Cleared\n\n\n");
   // arr_insert(arr, "STRING3", 1);
 
+  printf("\nCHECK SORTING:\n");
+  arr_append(arr, "D");
+  arr_append(arr, "C");
+  arr_append(arr, "G");
+  arr_append(arr, "A");
+  arr_append(arr, "Babba");
+  arr_append(arr, "Bubba");
+  arr_append(arr, "Fudge");
+  arr_append(arr, "Zed");
+  arr_append(arr, "T");
+  printf("UNSORTED ARRAY\n");
+  arr_print(arr);
+  printf(". Sorting alphabetically A to Z\n");
+  arr_sort(arr, arr_sort_A_2_Z);
+  printf("Array Sorted. Did it work?\n");
+  arr_print(arr);
+  printf("Now sorting Z-A, reverse alphabetically\n");
+  arr_sort(arr, arr_sort_Z_2_A);
   arr_print(arr);
 
+
+
+
+// TURN ON TO SEE VARIABLE ARGUMENT TESTING
+  // my_va_test(arr, 7, 1, 2, 4, 5);
+  // my_va_test(arr);
+
+  // char *wont_index = arr_pop_can_index(arr, wont_index);
+  // printf("This is the value of the popped string: %s\n", wont_index);
+  // char *can_index = arr_pop_can_index(arr, can_index, 5);
+  // printf("This is the value of the popped string: %s\n", can_index);
+
+  // my_get_va_cnt(1, 2, 3);
+  // my_get_va_cnt(5, 5, 5, 5, 5);
+  // my_get_va_cnt(9);
+  // my_get_va_cnt(6);
   destroy_array(arr);
 
   return 0;
