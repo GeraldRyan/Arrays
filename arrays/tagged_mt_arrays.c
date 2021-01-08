@@ -20,8 +20,15 @@ typedef struct Array
   int original_capacity;
   int count;
   // char **elements;       // This was a pointer to an array of strings
-  element *elements; // can't be the element itself or we can't have array. Has to be pointer for array ADT.
+  // element *elements; // can't be the element itself or we can't have array. Has to be pointer for array ADT.
+  struct element_wrapper *elements;
 } Array;
+
+typedef struct element_wrapper
+{
+  char *type;
+  union element *element;
+} element_wrapper;
 
 /*****
  * Allocate memory for a new array
@@ -36,7 +43,7 @@ Array *create_array(int capacity)
   a->count = 0;
   // Allocate memory for elements
   // a->elements = malloc(sizeof(char **) * capacity);
-  a->elements = malloc(sizeof(union element) * capacity); // Have to malloc the size of the array declared above. Could be 1. Could be 100.
+  a->elements = malloc(sizeof(struct element_wrapper) * capacity); // Have to malloc the size of the array declared above. Could be 1. Could be 100.
   return a;
 }
 
@@ -82,11 +89,11 @@ void destroy_array(Array *arr)
 
 void resize_array(Array *arr)
 {
-  union element *tmp;
+  struct element_wrapper *tmp;
   // Create a new element storage with double capacity
   arr->capacity *= 2;
   printf("Reallocing with new capacity %d\n", arr->capacity);
-  tmp = realloc(arr->elements, arr->capacity * sizeof(union element));
+  tmp = realloc(arr->elements, arr->capacity * sizeof(struct element_wrapper));
   if (tmp == NULL)
   {
     printf("Realloc failed\n");
@@ -108,7 +115,7 @@ void resize_array(Array *arr)
  *
  * Throw an error if the index is out of range.
  *****/
-union element *arr_read(Array *arr, int index)
+struct element_wrapper *arr_read(Array *arr, int index)
 {
   // Throw an error if the index is greater or equal to than the current count
   if (index > arr->count || index < 0)
@@ -120,36 +127,48 @@ union element *arr_read(Array *arr, int index)
   return (arr->elements + index); // why isn't this doing pointer arithmetic?
 }
 
-union element *new_element_i(int i)
+struct element_wrapper *new_element_i(int i)
 {
   union element *e = malloc(sizeof(union element));
   e->i = i;
-  return e;
+  struct element_wrapper *ewr = malloc(sizeof(struct element_wrapper));
+  ewr->element = e;
+  ewr->type = "int";
+  return ewr;
 }
-union element *new_element_s(char *s)
+struct element_wrapper *new_element_s(char *s)
 {
   union element *e = malloc(sizeof(union element));
   e->s = s;
-  return e;
+  struct element_wrapper *ewr = malloc(sizeof(struct element_wrapper));
+  ewr->element = e;
+  ewr->type = "string";
+  return ewr;
 }
-union element *new_element_c(char c)
+struct element_wrapper *new_element_c(char c)
 {
   union element *e = malloc(sizeof(union element));
   e->c = c;
-  return e;
+  struct element_wrapper *ewr = malloc(sizeof(struct element_wrapper));
+  ewr->element = e;
+  ewr->type = "char";
+  return ewr;
 }
-union element *new_element_f(float f)
+struct element_wrapper *new_element_f(float f)
 {
   union element *e = malloc(sizeof(union element));
   e->f = f;
-  return e;
+  struct element_wrapper *ewr = malloc(sizeof(struct element_wrapper));
+  ewr->element = e;
+  ewr->type = "float";
+  return ewr;
 }
 /*****
  * Insert an element to the array at the given index
  *
  * Store the VALUE of the given string, not the REFERENCE
  *****/
-void arr_insert(Array *arr, union element *e, int index)
+void arr_insert(Array *arr, struct element_wrapper *e, int index)
 {
   // Throw an error if the index is greater than the current count
   if (index > arr->count)
@@ -162,7 +181,7 @@ void arr_insert(Array *arr, union element *e, int index)
   if (arr->count == arr->capacity)
     resize_array(arr);
   // Move every element after the insert index to the right one position
-  memmove(arr->elements + ((index + 1)), arr->elements + (index), (arr->count - index) * sizeof(char *));
+  memmove(arr->elements + ((index + 1)), arr->elements + (index), (arr->count - index) * sizeof(struct element_wrapper )); // NB might be memory leak or pass by value, but proved the code works. 
   // Copy the element (hint: use `strdup()`) and add it to the array
   *(arr->elements + (index)) = *e; // copy pointers
 
@@ -173,7 +192,7 @@ void arr_insert(Array *arr, union element *e, int index)
 /*****
  * Append an element to the end of the array
  *****/
-void arr_append(Array *arr, union element *e)
+void arr_append(Array *arr, struct element_wrapper *e)
 {
   printf("Called here\n");
   if (arr->count == arr->capacity)
@@ -254,7 +273,40 @@ void arr_print(Array *arr)
     // if (i == 3)
     //   continue;
     // printf("Seg fault before\n");
-    printf("%s", arr->elements[i].s); // seg faults
+    char *type = arr->elements[i].type;
+    // printf("array->elements[%d]->type %s\n", i, type);
+
+    // switch (type)
+    // {
+    if (type == "string")
+    {
+      printf("%s", arr->elements[i].element->s); 
+    }
+    else if (type == "int")
+    {
+      printf("%d", arr->elements[i].element->i);
+    }
+    else if (type == "float")
+    {
+      printf("%f", arr->elements[i].element->f); 
+    }
+    else if (type == "char")
+    {
+      printf("%c", arr->elements[i].element->c); 
+    }
+    else
+    {
+      printf("Not sure. Type is %s \n", type); // seg faults
+    }
+    // case "char":
+    //   printf("%c", arr->elements[i].element->c); // seg faults
+    //   break;
+    // case "float":
+    //   printf("%d", arr->elements[i].element->f); // seg faults
+    //   break;
+    // default:
+    //   break;
+    // }
 
     // printf("Seg fault after\n");
 
@@ -505,12 +557,17 @@ int main(void)
   arr_append(arr, new_element_s("String 1"));
   arr_print(arr);
 
-  arr_insert(arr, new_element_s("String2"), 0);
+  arr_append(arr, new_element_s("String2"));
+  // arr_print(arr);
+
   arr_insert(arr, new_element_s("add"), 0);
-  arr_print(arr);
+  // arr_print(arr);
 
   arr_insert(arr, new_element_c('a'), 1);
+  // arr_print(arr);
+
   arr_insert(arr, new_element_i(1), 1);
+  arr_append(arr, new_element_f(4.5));
   arr_print(arr); // This breaks
 
   // arr_insert(arr, "STRING1", 0);
