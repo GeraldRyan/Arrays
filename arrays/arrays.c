@@ -5,6 +5,15 @@
 #include <stdarg.h> // for variadic functions
 #include "var_arg_util.h"
 
+typedef union
+{
+  float f;
+  int i;
+  long l;
+  char c;
+  char* s;
+} element;
+
 typedef struct Array
 {
   // can we add a dimensionality field?? GR
@@ -12,6 +21,7 @@ typedef struct Array
   int original_capacity; // How many elements can this array hold?
   int count;             // How many states does the array currently hold?
   char **elements;       // The string elements contained in the array
+  // element* elements;
 } Array;
 
 /************************************
@@ -32,7 +42,7 @@ Array *create_array(int capacity)
   a->capacity = capacity;
   a->original_capacity = capacity;
   a->count = 0;
-
+  
   // Allocate memory for elements
   a->elements = malloc(sizeof(char **) * capacity);
 
@@ -137,14 +147,12 @@ char *arr_read(Array *arr, int index)
  *****/
 void arr_insert(Array *arr, char *element, int index)
 {
-  // Throw an error if the index is greater than the current count
   if (index > arr->count)
   {
     fprintf(stderr, "Index out of range");
     printf("Index out of range in arr_insert\n");
     return;
   }
-  // Resize the array if the number of elements is over capacity
   if (arr->count == arr->capacity)
     resize_array(arr);
   // Move every element after the insert index to the right one position
@@ -454,8 +462,10 @@ int arr_extend(Array *arr1, Array *arr2)
   return 1;
 }
 
-Array* arr_copy(Array *dst, Array *src)
+Array* arr_copy(Array *src)
 {
+
+  Array* dst = create_array(1);
 
   dst->count = src->count;
   dst->capacity = src->capacity;
@@ -564,12 +574,12 @@ int main(void)
   arr_print(arr);
 
   printf("\nTESTING ARRAY COPY\n");
-  Array* arr_cpy = create_array(1);
+  Array* arr_cpy;
   printf("Printing array to copy\n");
   arr_print(arr);
   printf("Printing blank array\n");
-  arr_print(arr_cpy);
-  arr_cpy = arr_copy(arr_cpy, arr);
+  // arr_print(arr_cpy);
+  arr_cpy = arr_copy(arr);
   printf("Printing finished copy. Did it work?\n");
   arr_print(arr_cpy);
 

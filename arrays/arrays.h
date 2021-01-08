@@ -19,7 +19,7 @@ void arr_remove(Array *arr, char *element);
 int arr_clear(Array *arr); //
 char* arr_pop(Array *arr); // FINISHED BUT WANT TO MAKE THIS VARIADIC WITH INDEX FEATURE
 int arr_pop_no_rtn(Array *arr); // FINISHED BUT WANT TO MAKE THIS VARIADIC WITH INDEX FEATURE 
-int arr_copy(Array *dst, Array* src); 
+int arr_copy(Array *src); //
 int arr_index(Array *arr, char *element); //
 int arr_reverse(Array *arr); // 
 int arr_sort(Array *arr);  // 

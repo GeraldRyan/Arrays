@@ -130,10 +130,12 @@ char *day_3_array_tests(){
 char *stretch_array_tests()
 {
     Array *arr = create_array(10);
+    printf("Count %d", arr->count);
 
     /* CLEAR */
     arr_append(arr, "VALUE-1");
     arr_append(arr, "VALUE-2");
+    printf("Count %d", arr->count);
     mu_assert(arr->count == 2, "Count should be updated after append.");
 
     arr_clear(arr);
@@ -202,9 +204,9 @@ char *all_tests()
 {
     mu_suite_start();
 
-    mu_run_test(day_1_array_tests);
-    mu_run_test(day_2_array_tests);
-    mu_run_test(day_3_array_tests); // added myself to test array remove all function (and learn about this program)
+    // mu_run_test(day_1_array_tests);
+    // mu_run_test(day_2_array_tests);
+    // mu_run_test(day_3_array_tests); // added myself to test array remove all function (and learn about this program)
     mu_run_test(stretch_array_tests);
 
     return NULL;
