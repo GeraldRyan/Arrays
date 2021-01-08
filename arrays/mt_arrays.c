@@ -510,6 +510,10 @@ int main(void)
   arr_insert(arr, new_element_s("add"), 0);
   arr_print(arr);
 
+  arr_insert(arr, new_element_c('a'), 1);
+  arr_insert(arr, new_element_i(1), 1);
+  arr_print(arr); // This breaks
+
   // arr_insert(arr, "STRING1", 0);
   // arr_print(arr);
 
